@@ -1,17 +1,22 @@
 // Wait for the page to load fully
+const updatePrompt = () => {
+    const paragraphElement = document.querySelector('#prompt-textarea > p:not(.placeholder)');
+    paragraphElement.textContent = paragraphElement.textContent.substring(0, 3);
+};
+
 window.addEventListener("load", () => {
   const observer = new MutationObserver((mutations) => {
     mutations.forEach((mutation) => {
-      var submitButton = document.querySelector('button[aria-label="Send prompt"]');
-      if(submitButton) {
-          submitButton.addEventListener('click', () => {
-          // Get the DOM element
-          const paragraphElement = document.querySelector('#prompt-textarea > p:not(.placeholder)');
-          // Get its text content
-          const textContent = paragraphElement.textContent;
-          // Update with substring
-          paragraphElement.textContent = textContent.substring(0, 3);
-        });
+      if(document.querySelector('button[aria-label="Send prompt"]')) {
+        submitButton.addEventListener('click', () => {
+          updatePrompt();
+        }, true);
+        document.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter') {    
+              updatePrompt();
+          }
+        }, true);
+        
       }
     });
   });
