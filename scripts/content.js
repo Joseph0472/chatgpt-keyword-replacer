@@ -1,22 +1,21 @@
-// Wait for the page to load fully
-const updatePrompt = () => {
+const handleSubmit = (triggerMethod, event) => {
+  if(triggerMethod === 'click' || (triggerMethod === 'keydown' && event.key === 'Enter')) {
     const paragraphElement = document.querySelector('#prompt-textarea > p:not(.placeholder)');
     paragraphElement.textContent = paragraphElement.textContent.substring(0, 3);
+  }
 };
 
 window.addEventListener("load", () => {
   const observer = new MutationObserver((mutations) => {
+    const submitButton = document.querySelector('button[aria-label="Send prompt"]');
     mutations.forEach((mutation) => {
-      if(document.querySelector('button[aria-label="Send prompt"]')) {
-        submitButton.addEventListener('click', () => {
-          updatePrompt();
-        }, true);
-        document.addEventListener('keydown', (event) => {
-          if (event.key === 'Enter') {    
-              updatePrompt();
-          }
-        }, true);
-        
+      if(submitButton) {
+        // Add event listeners
+        submitButton.addEventListener('click', handleSubmit('click'), true);
+        document.addEventListener('keydown', (event) => { handleSubmit('keydown', event) }, true);
+        // Remove event listeners
+        submitButton.removeEventListener('click', handleSubmit('click'), true);
+        document.removeEventListener('keydown', (event) => { handleSubmit('keydown', event) }, true);
       }
     });
   });
