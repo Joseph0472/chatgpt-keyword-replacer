@@ -1,25 +1,38 @@
-const handleSubmit = (triggerMethod, event) => {
-  if(triggerMethod === 'click' || (triggerMethod === 'keydown' && event.key === 'Enter')) {
-    const paragraphElement = document.querySelector('#prompt-textarea > p:not(.placeholder)');
-    paragraphElement.textContent = paragraphElement.textContent.substring(0, 3);
-  }
+let Constants = {};
+let KeywordsDict = {};
+// Get Constants from background.js
+chrome.storage.local.get((result) => { Constants = result.Constants; KeywordsDict = result.KeywordsDict });
+
+// Update the prompt
+const updatePrompt = () => {
+  const paragraphElements = document.querySelectorAll(Constants.PROMPT_TEXTAREA_SELECTOR);
+  paragraphElements.forEach(element => {
+    element.textContent = replaceKeywords(element.textContent);
+  });
 };
 
-window.addEventListener("load", () => {
-  const observer = new MutationObserver((mutations) => {
-    const submitButton = document.querySelector('button[aria-label="Send prompt"]');
-    mutations.forEach((mutation) => {
-      if(submitButton) {
-        // Add event listeners
-        submitButton.addEventListener('click', handleSubmit('click'), true);
-        document.addEventListener('keydown', (event) => { handleSubmit('keydown', event) }, true);
-        // Remove event listeners
-        submitButton.removeEventListener('click', handleSubmit('click'), true);
-        document.removeEventListener('keydown', (event) => { handleSubmit('keydown', event) }, true);
-      }
-    });
+// Replace keywords in the text
+const replaceKeywords = (text) => {
+  Object.keys(KeywordsDict).forEach(keyword => {
+    text = text.replace(keyword, KeywordsDict[keyword]);
   });
-  
-  // Start observing the entire body for child list changes
-  observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+  return text;
+};
+
+// Observe the body for changes
+window.addEventListener("load", () => {
+const observer = new MutationObserver((mutations) => {
+  const submitButton = document.querySelector(Constants.SEND_BUTTON_SELECTOR);
+  mutations.forEach((mutation) => {
+    if(submitButton) {
+      submitButton.addEventListener('click', () => { updatePrompt() }, true);
+      submitButton.removeEventListener('click', () => { updatePrompt() }, true);
+      document.addEventListener('keydown', (event) => { if (event.key === Constants.KEY_ENTER && !event.shiftKey) { updatePrompt() }}, true);
+      document.removeEventListener('keydown', (event) => { if (event.key === Constants.KEY_ENTER && !event.shiftKey) { updatePrompt() }}, true);
+    }
+  });
+});
+
+// Start observing the entire body for child list changes
+observer.observe(document.body, { childList: true, subtree: true, characterData: true });
 });
