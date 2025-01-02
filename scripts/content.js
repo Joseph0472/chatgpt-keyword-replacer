@@ -6,6 +6,7 @@ chrome.storage.local.get((result) => { Constants = result.Constants; KeywordsDic
 // Update the prompt
 const updatePrompt = () => {
   const paragraphElements = document.querySelectorAll(Constants.PROMPT_TEXTAREA_SELECTOR);
+  chrome.storage.local.get((result) => { Constants = result.Constants; KeywordsDict = result.KeywordsDict });
   paragraphElements.forEach(element => {
     element.textContent = replaceKeywords(element.textContent);
   });
@@ -13,10 +14,11 @@ const updatePrompt = () => {
 
 // Replace keywords in the text
 const replaceKeywords = (text) => {
-  Object.keys(KeywordsDict).forEach(keyword => {
-    text = text.replace(keyword, KeywordsDict[keyword]);
-  });
-  return text;
+  Object.entries(KeywordsDict).forEach(([keyword, replacement]) => {
+    const regex = new RegExp(keyword, 'gi');
+    text = text.replace(regex, replacement);
+});
+return text;
 };
 
 // Observe the body for changes
