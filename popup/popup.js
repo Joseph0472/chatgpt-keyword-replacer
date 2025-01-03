@@ -10,8 +10,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         div.className = 'keyword-pair';
         
         div.innerHTML = `
-            <input type="text" class="keyword" value="${keyword}" placeholder="Keyword">
-            <input type="text" class="replacement" value="${replacement}" placeholder="Replacement">
+            <input type="text" class="keyword" value="${keyword}" placeholder="keyword">
+            <input type="text" class="replacement" value="${replacement}" placeholder="replacement">
             <button class="remove">X</button>
         `;
 
@@ -24,6 +24,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         keywordList.appendChild(createKeywordPair(keyword, replacement));
     });
 
+    function showStatus(message, type = 'success') {
+        const statusEl = document.getElementById('statusMessage');
+        statusEl.textContent = message;
+        statusEl.className = `status-message ${type}`;
+        
+        // Force reflow to ensure transition works
+        statusEl.offsetHeight;
+        
+        statusEl.classList.add('show');
+        
+        setTimeout(() => {
+            statusEl.classList.remove('show'); 
+        }, 2000);
+    }
+
     // Add new keyword pair
     document.getElementById('addNew').addEventListener('click', () => {
         keywordList.appendChild(createKeywordPair());
@@ -33,38 +48,42 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('saveChanges').addEventListener('click', async () => {
         try {
             const newKeywords = {};
+            let hasInvalidInput = false;
+
             document.querySelectorAll('.keyword-pair').forEach(pair => {
                 const keyword = pair.querySelector('.keyword').value.trim();
                 const replacement = pair.querySelector('.replacement').value.trim();
+                
+                // Check for empty strings or spaces
+                if (!keyword || !replacement) {
+                    hasInvalidInput = true;
+                    pair.classList.add('invalid');
+                    return;
+                }
+                
+                pair.classList.remove('invalid');
                 if (keyword && replacement) {
                     newKeywords[keyword] = replacement;
                 }
             });
-    
-            // Debug logs
-            console.log('About to save:', {
-                Constants: result.Constants,
-                KeywordsDict: newKeywords
-            });
-    
+
+            if (hasInvalidInput) {
+                showStatus('Please fill in all fields', 'error');
+                return;
+            }
+
+            // Using await with chrome.storage.local.set
             await chrome.storage.local.set({
                 Constants: result.Constants,
                 KeywordsDict: newKeywords
             });
-    
-            // Verify the save by reading back
-            const savedData = await chrome.storage.local.get(['Constants', 'KeywordsDict']);
-            console.log('Saved data:', savedData);
-    
-            alert('Keywords saved successfully!');
+
+            // Show success message after successful save
+            showStatus('Saved successfully');
         } catch (error) {
-            // More detailed error logging
-            console.error('Error details:', {
-                message: error.message,
-                stack: error.stack,
-                error
-            });
-            alert('Failed to save keywords. Check console for details.');
+            // Handle any errors
+            console.error('Error saving keywords:', error);
+            showStatus('Failed to save', 'error');
         }
     });
 });

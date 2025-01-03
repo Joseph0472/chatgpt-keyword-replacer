@@ -1,31 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Keyword Manager</title>
-    <style>
-        body {
-            width: 300px;
-            padding: 10px;
-        }
-        .keyword-pair {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-        .keyword-pair input {
-            flex: 1;
-        }
-        .actions {
-            margin-top: 10px;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="popup.css">
+    <title>Keywords</title>
 </head>
 <body>
-    <h2>Keyword Manager</h2>
+    <div class="header">
+        <h3 style="margin: 0">Keywords</h3>
+        <button id="addNew" class="primary-btn">+ Add New</button>
+    </div>
     <div id="keywordList"></div>
     <div class="actions">
-        <button id="addNew">Add New Keyword</button>
-        <button id="saveChanges">Save Changes</button>
+        <button id="saveChanges" class="primary-btn">Save Changes</button>
+        <span id="statusMessage" class="status-message"></span>
     </div>
     <script src="popup.js"></script>
 </body>

@@ -6,7 +6,7 @@ chrome.storage.local.get((result) => { Constants = result.Constants; KeywordsDic
 // Update the prompt
 const updatePrompt = () => {
   const paragraphElements = document.querySelectorAll(Constants.PROMPT_TEXTAREA_SELECTOR);
-  chrome.storage.local.get((result) => { Constants = result.Constants; KeywordsDict = result.KeywordsDict });
+  chrome.storage.local.get((result) => { KeywordsDict = result.KeywordsDict });
   paragraphElements.forEach(element => {
     element.textContent = replaceKeywords(element.textContent);
   });
