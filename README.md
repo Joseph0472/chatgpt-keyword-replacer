@@ -1,6 +1,6 @@
 # Chatgpt Keywords Replacer
 
-Replace keywords in your Chatgpt prompts
+Replace keywords in your ChatGPT prompts
 
 ## Running this extension locally
 

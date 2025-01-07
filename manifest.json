@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "ChatGPT Keywords Replacer",
-  "description": "Chatgpt Keywords Replacer",
+  "description": "Replace keywords in your ChatGPT prompts.",
   "version": "1.1",
   "icons": {
     "16": "images/icon-16.png",
